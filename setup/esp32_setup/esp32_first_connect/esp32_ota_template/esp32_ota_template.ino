@@ -13,9 +13,8 @@ void setup() {
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
-  // End of OTA void setup
-  }
-  // Start of OTA ArduinoOTA.onStart
+  }  
+ 
   // Port defaults to 3232
   // ArduinoOTA.setPort(3232);
 
@@ -56,8 +55,10 @@ void setup() {
     }
   });
   ArduinoOTA.begin();
+  // End of OTA void setup
+
 }
-  // End of OTA ArduinoOTA.onStart
+
 
 void loop() {
   // Start of OTA void loop
