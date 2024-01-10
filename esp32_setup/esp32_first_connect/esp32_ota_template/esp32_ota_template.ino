@@ -1,17 +1,21 @@
+// Start of OTA global
 #include <WiFi.h>
 #include <ArduinoOTA.h>
 
-const char* ssid = "#####";     // Replace with your WiFi network name
-const char* password = "#####"; // Replace with your WiFi network password
+const char* ssid = "your_ssid";     // Replace with your WiFi network name
+const char* password = "your_password"; // Replace with your WiFi network password
+//End of OTA global
 
 void setup() {
+  // Start of OTA void setup
   Serial.begin(115200);
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
+  // End of OTA void setup
   }
-
+  // Start of OTA ArduinoOTA.onStart
   // Port defaults to 3232
   // ArduinoOTA.setPort(3232);
 
@@ -53,7 +57,10 @@ void setup() {
   });
   ArduinoOTA.begin();
 }
+  // End of OTA ArduinoOTA.onStart
 
 void loop() {
+  // Start of OTA void loop
   ArduinoOTA.handle();
+  // End of OTA void loop
 }
