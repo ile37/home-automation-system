@@ -1,5 +1,6 @@
 import sys
 import os
+import subprocess
 
 if len(sys.argv) < 2:
     print("Usage: python3 arduino_sketch_merger.py <path_to_sketch_to_merge> ")
@@ -66,4 +67,17 @@ with open(filepath_to_merge, "r") as sketch_file:
 
 
 # TODO - Add a check to see if the sketch compiles before uploading
+        # sudo ./arduino-cli compile --fqbn esp32:esp32:esp32 merged_sketch_temp.ino
+command = ["sudo", "./arduino-cli", "compile", "--fqbn esp32:esp32:esp32",
+          "merged_sketch_temp.ino"]
+
+process = subprocess.Popen(command, text=True)
+
+if process.returncode == 0:
+    print("Sketch compiled successfully.")  
+
+else:
+    print("Sketch compilation failed.")
+    sys.exit(1)
+
 # TODO - Upload the sketch to the board
