@@ -12,6 +12,7 @@ wifi_password = os.environ.get("WIFI_PASSWORD")
 
 # Check if the environment variables exist
 if wifi_ssid is None or wifi_password is None:
+    print(f"{wifi_ssid} {wifi_password}")
     print("WiFi credentials not set in environment variables.")
     print("forgot command: [source ~/.profile] ?")
     sys.exit(1)
@@ -62,16 +63,16 @@ with open(filepath_to_merge, "r") as sketch_file:
     sketch_to_merge.insert(void_loop_index, ota_setup[2])
 
     # Written to a temp file to be accessed by the arduino-cli
-    with open("merged_sketch_temp.ino", "w") as merged_file:
+    with open("merged_sketch_temp/merged_sketch_temp.ino", "w") as merged_file:
         merged_file.writelines(sketch_to_merge)
 
 
 # TODO - Add a check to see if the sketch compiles before uploading
         # sudo ./arduino-cli compile --fqbn esp32:esp32:esp32 merged_sketch_temp.ino
-command = ["sudo", "./arduino-cli", "compile", "--fqbn esp32:esp32:esp32",
-          "merged_sketch_temp.ino"]
+command = "sudo ./arduino-cli compile --fqbn esp32:esp32:esp32 ./merged_sketch_temp"
 
-process = subprocess.Popen(command, text=True)
+print("Starting compile")
+process = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
 if process.returncode == 0:
     print("Sketch compiled successfully.")  
