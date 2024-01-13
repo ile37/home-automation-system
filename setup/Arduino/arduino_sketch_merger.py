@@ -67,21 +67,20 @@ with open(filepath_to_merge, "r") as sketch_file:
         merged_file.writelines(sketch_to_merge)
 
 # Compile the sketch    
-if len(sys.argv) > 2:
-    if sys.argv[3] == "nocompile":
-        print("Skipping compilation")
-
-command = "sudo ./arduino-cli compile --fqbn esp32:esp32:esp32 ./merged_sketch_temp"
-
-print("Starting compile")
-process = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-
-if process.returncode == 0:
-    print("Sketch compiled successfully.")  
-
+if len(sys.argv) > 3 and sys.argv[3] == "nocompile":
+    print("Skipping compilation")
 else:
-    print("Sketch compilation failed.")
-    sys.exit(1)
+    command = "sudo ./arduino-cli compile --fqbn esp32:esp32:esp32 ./merged_sketch_temp"
+
+    print("Starting compile")
+    process = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+    if process.returncode == 0:
+        print("Sketch compiled successfully.")  
+
+    else:
+        print("Sketch compilation failed.")
+        sys.exit(1)
 
 # Upload the sketch
 if sys.argv[2] == "upload":
