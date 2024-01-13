@@ -68,7 +68,7 @@ with open(filepath_to_merge, "r") as sketch_file:
 
 # Compile the sketch
         
-if len(sys.argv) > 2:
+if len(sys.argv) > 3:
     if sys.argv[3] == "nocompile":
         print("Skipping compilation")
 else:
@@ -88,10 +88,11 @@ else:
 if sys.argv[2] == "upload":
 
     # TODO: Fetch the board ip from the esp32 ip database
-    board_ip = "192.186.1.4"
+    board_ip = "192.168.1.4"
 
     print("Uploading the sketch to the board")
     command = F"sudo ./arduino-cli upload -p {board_ip} --fqbn esp32:esp32:esp32 ./merged_sketch_temp"
+    print(command)
     process = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     if process.returncode == 0:
