@@ -66,9 +66,7 @@ with open(filepath_to_merge, "r") as sketch_file:
     with open("merged_sketch_temp/merged_sketch_temp.ino", "w") as merged_file:
         merged_file.writelines(sketch_to_merge)
 
-
-# TODO - Add a check to see if the sketch compiles before uploading
-        # sudo ./arduino-cli compile --fqbn esp32:esp32:esp32 merged_sketch_temp.ino
+# Compile the sketch
 command = "sudo ./arduino-cli compile --fqbn esp32:esp32:esp32 ./merged_sketch_temp"
 
 print("Starting compile")
@@ -81,4 +79,20 @@ else:
     print("Sketch compilation failed.")
     sys.exit(1)
 
-# TODO - Upload the sketch to the board
+# Upload the sketch
+if sys.argv[2] == "upload":
+
+    # TODO: Fetch the board ip from the esp32 ip database
+    board_ip = "192.186.1.4"
+
+    print("Uploading the sketch to the board")
+    command = F"sudo ./arduino-cli upload -p {board_ip} --fqbn esp32:esp32:esp32 ./merged_sketch_temp"
+    process = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+    if process.returncode == 0:
+        print("Sketch uploaded successfully.")  
+
+    else:
+        print("Sketch upload failed.")
+        sys.exit(1)
+
