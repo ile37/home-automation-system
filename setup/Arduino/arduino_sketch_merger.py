@@ -90,7 +90,13 @@ if sys.argv[2] == "upload":
 
     print("Uploading the sketch to the board")
     command = F"sudo ./arduino-cli upload -p {board_ip} --fqbn esp32:esp32:esp32 ./merged_sketch_temp"
-    process = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    while True:
+        output = process.stdout.readline()
+        if process.poll() is not None and output == '':
+            break
+        if output:
+            print(output.strip().decode())
 
     if process.returncode == 0:
         print("Sketch uploaded successfully.")  
