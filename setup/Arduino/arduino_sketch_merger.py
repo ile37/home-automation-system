@@ -2,6 +2,8 @@ import sys
 import os
 import subprocess
 
+# TODO: --help flag and --nocompile flag? hepl text file?
+
 if len(sys.argv) < 2:
     print("Usage: python3 arduino_sketch_merger.py <path_to_sketch_to_merge> ")
     sys.exit(1)
@@ -88,6 +90,8 @@ if sys.argv[2] == "upload":
     # TODO: Fetch the board ip from the esp32 ip database
     board_ip = "192.168.1.4"
 
+    # TODO: Check if the board is online
+    # TODO: cleaner way to run the command
     print("Uploading the sketch to the board")
     command = F"sudo ./arduino-cli upload -p {board_ip} --fqbn esp32:esp32:esp32 ./merged_sketch_temp"
     process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
