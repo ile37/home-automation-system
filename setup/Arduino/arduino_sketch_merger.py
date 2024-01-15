@@ -1,12 +1,38 @@
 import sys
 import os
 import subprocess
+import json
 
 # TODO: --help flag and --nocompile flag? hepl text file?
 
 if len(sys.argv) < 2:
     print("Usage: python3 arduino_sketch_merger.py <path_to_sketch_to_merge> ")
     sys.exit(1)
+
+# get the hostname from the path and check if it is logged in the esp32_hostname_log 
+path = sys.argv[1]
+parts = path.split('/')
+home_index = parts.index('home')
+hostname = '/'.join(parts[home_index + 1:]) + "/esp32_1"
+
+with open("../esp32_setup/esp32_hostname_log/esp32_hostname_log.json", "r") as esp32_hostname_log_file:
+    esp32_hostname_log = json.load(esp32_hostname_log_file)
+
+is_logged = False
+for esp32 in esp32_hostname_log:
+    if esp32.get("hostname") == hostname:
+        is_logged = True
+        break
+
+if not is_logged:
+    esp32_json = {
+        "hostname": hostname
+    }
+    esp32_hostname_log.append(esp32_json)
+    print(f"Hostname not in esp32_hostname_log, added as {hostname}")
+    with open("../esp32_setup/esp32_hostname_log/esp32_hostname_log.json", "w") as esp32_hostname_log_file:
+        json.dump(esp32_hostname_log, esp32_hostname_log_file, indent=4)
+
 
 # Credentials for the WiFi are stored as environment variables in .profile file
 wifi_ssid = os.environ.get("WIFI_SSID")
@@ -43,7 +69,9 @@ with open("../esp32_setup/esp32_first_connect/esp32_ota_template/" + \
 
 # Wifi crediential swap
 ota_setup[0] = ota_setup[0].replace("your_ssid", wifi_ssid)
-ota_setup[0] = ota_setup[0].replace("your_password", wifi_password)          
+ota_setup[0] = ota_setup[0].replace("your_password", wifi_password)     
+
+# TODO: swap the hostname in the OTA setup code
 
 with open(filepath_to_merge, "r") as sketch_file_indexs:
 
