@@ -10,11 +10,13 @@ void setup() {
   // Start of OTA void setup
   Serial.begin(115200);
   WiFi.begin(ssid, password);
+  WiFi.Hostname("myesp32")
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
   }  
- 
+  Wifi.config()
+
   // Port defaults to 3232
   // ArduinoOTA.setPort(3232);
 
