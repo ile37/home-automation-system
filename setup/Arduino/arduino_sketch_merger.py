@@ -71,7 +71,8 @@ with open("../esp32_setup/esp32_first_connect/esp32_ota_template/" + \
 ota_setup[0] = ota_setup[0].replace("your_ssid", wifi_ssid)
 ota_setup[0] = ota_setup[0].replace("your_password", wifi_password)     
 
-# TODO: swap the hostname in the OTA setup code
+# swap the hostname
+ota_setup[1] = ota_setup[1].replace("myesp32", hostname)
 
 with open(filepath_to_merge, "r") as sketch_file_indexs:
 
