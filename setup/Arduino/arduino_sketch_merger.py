@@ -13,7 +13,7 @@ if len(sys.argv) < 2:
 path = sys.argv[1]
 parts = path.split('/')
 home_index = parts.index('home')
-hostname = '/'.join(parts[home_index + 1:]) + "/esp32_1"
+hostname = '/'.join(parts[home_index + 1:-2]) + "/esp32_1"
 
 with open("../esp32_setup/esp32_hostname_log/esp32_hostname_log.json", "r") as esp32_hostname_log_file:
     esp32_hostname_log = json.load(esp32_hostname_log_file)
