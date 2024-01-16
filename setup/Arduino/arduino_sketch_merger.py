@@ -137,4 +137,6 @@ if sys.argv[2] == "upload":
     else:
         print("Sketch upload failed.")
         sys.exit(1)
+else:
+    print("Skipping upload")
 
