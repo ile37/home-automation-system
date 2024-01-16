@@ -9,6 +9,8 @@ if len(sys.argv) < 2:
     print("Usage: python3 arduino_sketch_merger.py <path_to_sketch_to_merge> ")
     sys.exit(1)
 
+# TODO: ip address instead of hostname (seems hostname as ip when uploading is a feature not implemented in arduino-cli)
+
 # get the hostname from the path and check if it is logged in the esp32_hostname_log 
 path = sys.argv[1]
 parts = path.split('/')
