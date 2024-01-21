@@ -14,14 +14,10 @@ void setup() {
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
-  }  
-  Wifi.config()
-
-  // Port defaults to 3232
-  // ArduinoOTA.setPort(3232);
-
-  // Hostname defaults to esp3232-[MAC]
-  ArduinoOTA.setHostname("myesp32");
+  }
+  //print the local IP address
+  ip = WiFi.localIP();
+  Serial.println(ip);
 
   // No authentication by default
   // ArduinoOTA.setPassword("admin");
