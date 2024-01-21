@@ -2,6 +2,7 @@ import sys
 import os
 import subprocess
 import json
+import time
 
 UPLOAD_TEMP_PATH = "merged_sketch_temp/merged_sketch_temp.ino"
 OTA_TEMPLATE_PATH = "../esp32_setup/esp32_first_connect/esp32_ota_template/esp32_ota_template.ino"
@@ -125,21 +126,33 @@ def arduino_upload(command):
     # TODO: cleaner way to run the command
     print("Uploading the sketch to the board")
     process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
     while True:
+
+        time.sleep(0.5)
+
         output = process.stdout.readline()
         poll = process.poll()
+
         if poll is not None and output == '':
             break
         if output:
             print(output.strip().decode())
-            print(f"poll() output: {poll}")
+            if "A fatal error occurred:" in str(output):
+                break
 
-    if process.returncode == 0:
-        print("Sketch uploaded successfully.")  
+            if "following info" in str(output):
+                print("Press enter")
 
-    else:
-        print("Sketch upload failed.")
-        sys.exit(1)
+            if "port" in str(output):
+                ip = str(output)
+
+        if process.returncode == 0:
+            print("Sketch uploaded successfully.")
+            return ip
+
+    print("Sketch upload failed.")
+    sys.exit(1)
 
 
 def main():
@@ -166,7 +179,8 @@ def main():
         print("No compile flag, skipping compile step.")
 
     if "upload" in sys.argv:
-        arduino_upload(UPLOAD_CMD)
+        ip = arduino_upload(UPLOAD_CMD)
+        print(f"uploaded to: {ip}")
     else:
         print("No upload flag, skipping upload step.")
 
