@@ -14,7 +14,7 @@ UPLOAD_CMD = "sudo ./arduino-cli upload -p board_ip --fqbn esp32:esp32:esp32 ./m
 # TODO: --help flag and --nocompile flag? help text file? README.md?
 # TODO: ip address instead of hostname (seems hostname as ip when uploading is a feature not implemented in arduino-cli)
   
-def log_esp32_ip():
+def log_esp32_ip(ip):
     # get the hostname from the path and check if it is logged in the esp32_hostname_log 
     path = sys.argv[1]
     parts = path.split('/')
@@ -32,7 +32,8 @@ def log_esp32_ip():
 
     if not is_logged:
         esp32_json = {
-            "hostname": hostname
+            "hostname": hostname,
+            "ip": ip
         }
         esp32_hostname_log.append(esp32_json)
         print(f"Hostname not in esp32_hostname_log, added as {hostname}")
@@ -144,8 +145,9 @@ def arduino_upload(command):
             if "following info" in str(output):
                 print("Press enter")
 
-            if "port" in str(output):
-                ip = str(output)
+            if "New upload port" in str(output):
+                output_string = str(output).split(" ")
+                ip = output_string[3]
 
         if process.returncode == 0:
             print("Sketch uploaded successfully.")
@@ -171,7 +173,6 @@ def main():
         sys.exit(1)
     else:
         merge_ino_files(filepath_to_merge)
-        log_esp32_ip()
 
     if "compile" in sys.argv:
         arduino_compile(COMPILE_CMD)
@@ -181,6 +182,7 @@ def main():
     if "upload" in sys.argv:
         ip = arduino_upload(UPLOAD_CMD)
         print(f"uploaded to: {ip}")
+        log_esp32_ip(ip)
     else:
         print("No upload flag, skipping upload step.")
 
