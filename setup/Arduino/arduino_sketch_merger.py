@@ -9,17 +9,14 @@ OTA_TEMPLATE_PATH = "../esp32_setup/esp32_first_connect/esp32_ota_template/esp32
 ESP32_LOG_PATH = "../esp32_setup/esp32_hostname_log/esp32_hostname_log.json"
 
 COMPILE_CMD = "sudo ./arduino-cli compile --fqbn esp32:esp32:esp32 ./merged_sketch_temp"
-UPLOAD_CMD = "sudo ./arduino-cli upload -p board_ip --fqbn esp32:esp32:esp32 ./merged_sketch_temp"
+UPLOAD_CMD = "sudo ./arduino-cli upload -p port --fqbn esp32:esp32:esp32 ./merged_sketch_temp"
 
 # TODO: --help flag and --nocompile flag? help text file? README.md?
 # TODO: ip address instead of hostname (seems hostname as ip when uploading is a feature not implemented in arduino-cli)
   
-def log_esp32_ip(ip):
-    # get the hostname from the path and check if it is logged in the esp32_hostname_log 
-    path = sys.argv[1]
-    parts = path.split('/')
-    home_index = parts.index('home')
-    hostname = '/'.join(parts[home_index + 1:-1]) + "/esp32_1"
+def log_esp32(ip):
+
+    hostname = get_hostname()
 
     with open(ESP32_LOG_PATH, "r") as esp32_hostname_log_file:
         esp32_hostname_log = json.load(esp32_hostname_log_file)
@@ -41,9 +38,24 @@ def log_esp32_ip(ip):
             json.dump(esp32_hostname_log, esp32_hostname_log_file, indent=4)
 
 
-def get_esp32_ip(hostname):
-    pass
+def get_esp32_ip():
+    hostname = get_hostname()
 
+    with open(ESP32_LOG_PATH, "r") as esp32_hostname_log_file:
+        esp32_hostname_log = json.load(esp32_hostname_log_file)
+    for esp32 in esp32_hostname_log:
+        if esp32.get("hostname") == hostname:
+            return esp32.get("ip")
+    raise Exception("Hostname not found in esp32_hostname_log")
+
+
+def get_hostname():
+    # get the hostname from the path from command line argument
+    path = sys.argv[1]
+    parts = path.split('/')
+    home_index = parts.index('home')
+    hostname = '/'.join(parts[home_index + 1:-1]) + "/esp32_1"
+    return hostname
 
 def merge_ino_files(filepath_to_merge):
 
@@ -117,13 +129,10 @@ def arduino_compile(command):
         sys.exit(1)
 
 
-def arduino_upload(command):
-    # TODO: Fetch the board ip from the esp32 ip database
-    board_ip = "192.168.1.4"
+def arduino_upload(command, port):
 
-    command = command.replace("board_ip", board_ip)
+    command = command.replace("port", port)
 
-    # TODO: Check if the board is online
     # TODO: cleaner way to run the command
     print("Uploading the sketch to the board")
     process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -151,7 +160,7 @@ def arduino_upload(command):
 
         if process.returncode == 0:
             print("Sketch uploaded successfully.")
-            return ip
+            return 
 
     print("Sketch upload failed.")
     sys.exit(1)
@@ -179,10 +188,13 @@ def main():
     else:
         print("No compile flag, skipping compile step.")
 
+    if "usb" in sys.argv:
+        ip = arduino_upload(UPLOAD_CMD, "/dev/ttyUSB0")
+        log_esp32(ip)
+
     if "upload" in sys.argv:
-        ip = arduino_upload(UPLOAD_CMD)
-        print(f"uploaded to: {ip}")
-        log_esp32_ip(ip)
+        ip = get_esp32_ip()
+        arduino_upload(UPLOAD_CMD, ip)
     else:
         print("No upload flag, skipping upload step.")
 
