@@ -138,15 +138,7 @@ def arduino_upload(command, port):
     print(f"Uploading the sketch to the board via port {port}")
     process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-    ser = serial.Serial('/dev/ttyUSB0', 115200, timeout=1)
-
     while True:
-
-        line = ser.readline().decode('utf-8').rstrip()
-        if line:
-            print("Received from esp: :", line)
-
-        time.sleep(0.5)
 
         output = process.stdout.readline()
         poll = process.poll()
@@ -161,18 +153,32 @@ def arduino_upload(command, port):
             if "following info" in str(output):
                 print("Press enter")
 
-            if "New upload port" in str(output):
-                output_string = str(output).split(" ")
-                ip = output_string[3]
-
         if process.returncode == 0:
             print("Sketch uploaded successfully.")
-            ser.close()
-
             return 
 
     print("Sketch upload failed.")
     sys.exit(1)
+
+
+def esp32_serial_com_get_ip():
+
+    time_now = time.time()
+
+    ser = serial.Serial('/dev/ttyUSB0', 115200, timeout=1)
+    while True:
+        line = ser.readline().decode('utf-8').rstrip()
+        if line:
+            print("Received from esp: :", line)
+        
+        if "IP address:" in line:
+            ip = line.split(" ")[-1]
+            ser.close()
+            return ip
+        if time.time() - time_now > 6:
+            print("Timeout")
+            ser.close()
+            return None
 
 
 def main():
@@ -199,7 +205,8 @@ def main():
 
     if "usb_upload" in sys.argv:
         print("Uploading to usb")
-        ip = arduino_upload(UPLOAD_CMD, "/dev/ttyUSB0")
+        arduino_upload(UPLOAD_CMD, "/dev/ttyUSB0")
+        ip = esp32_serial_com_get_ip()
         print(f"log ip: {ip}")
         log_esp32(ip)
 
