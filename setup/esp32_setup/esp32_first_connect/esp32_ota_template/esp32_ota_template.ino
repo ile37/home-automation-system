@@ -16,8 +16,9 @@ void setup() {
     Serial.print(".");
   }
   //print the local IP address
-  ip = WiFi.localIP();
-  Serial.println(ip);
+  delay(1000);
+  Serial.print("IP Address: ");
+  Serial.println(WiFi.localIP());  
 
   // No authentication by default
   // ArduinoOTA.setPassword("admin");
