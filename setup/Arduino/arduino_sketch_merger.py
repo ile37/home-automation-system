@@ -3,6 +3,7 @@ import os
 import subprocess
 import json
 import time
+import serial
 
 UPLOAD_TEMP_PATH = "merged_sketch_temp/merged_sketch_temp.ino"
 OTA_TEMPLATE_PATH = "../esp32_setup/esp32_first_connect/esp32_ota_template/esp32_ota_template.ino"
@@ -134,10 +135,16 @@ def arduino_upload(command, port):
     command = command.replace("port", port)
 
     # TODO: cleaner way to run the command
-    print("Uploading the sketch to the board")
+    print(f"Uploading the sketch to the board via port {port}")
     process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
+    ser = serial.Serial('/dev/ttyUSB0', 115200, timeout=1)
+
     while True:
+
+        line = ser.readline().decode('utf-8').rstrip()
+        if line:
+            print("Received from esp: :", line)
 
         time.sleep(0.5)
 
@@ -147,7 +154,7 @@ def arduino_upload(command, port):
         if poll is not None and output == '':
             break
         if output:
-            print(output.strip().decode())
+            print(f"output of cmd: {output.strip().decode()}")
             if "A fatal error occurred:" in str(output):
                 break
 
@@ -160,6 +167,8 @@ def arduino_upload(command, port):
 
         if process.returncode == 0:
             print("Sketch uploaded successfully.")
+            ser.close()
+
             return 
 
     print("Sketch upload failed.")
@@ -188,8 +197,10 @@ def main():
     else:
         print("No compile flag, skipping compile step.")
 
-    if "usb" in sys.argv:
+    if "usb_upload" in sys.argv:
+        print("Uploading to usb")
         ip = arduino_upload(UPLOAD_CMD, "/dev/ttyUSB0")
+        print(f"log ip: {ip}")
         log_esp32(ip)
 
     if "upload" in sys.argv:
