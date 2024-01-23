@@ -1,1 +1,6 @@
-[]
+[
+    {
+        "hostname": "livingroom/curtains/curtainController/esp32_1",
+        "ip": null
+    }
+]

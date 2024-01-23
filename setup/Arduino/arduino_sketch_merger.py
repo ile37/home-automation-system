@@ -171,7 +171,7 @@ def esp32_serial_com_get_ip():
         if line:
             print("Received from esp: :", line)
         
-        if "IP address:" in line:
+        if "IP Address:" in str(line):
             ip = line.split(" ")[-1]
             ser.close()
             return ip

@@ -55,7 +55,6 @@ void setup() {
   });
   ArduinoOTA.begin();
   // End of OTA void setup
-
 }
 
 
