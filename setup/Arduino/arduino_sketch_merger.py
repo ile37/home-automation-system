@@ -25,6 +25,11 @@ def log_esp32(ip):
     is_logged = False
     for esp32 in esp32_hostname_log:
         if esp32.get("hostname") == hostname:
+            if esp32.get("ip") != ip:
+                esp32["ip"] = ip
+                with open(ESP32_LOG_PATH, "w") as esp32_hostname_log_file:
+                    json.dump(esp32_hostname_log, esp32_hostname_log_file, indent=4)
+                print(f"Hostname {hostname} ip changed to {ip}")    
             is_logged = True
             break
 
