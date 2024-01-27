@@ -218,14 +218,14 @@ def main():
         print("No compile flag, skipping compile step.")
 
     if "upload" in sys.argv:
-        if "usb_upload" in sys.argv:
+        if "usb" in sys.argv:
             port = "/dev/ttyUSB0"
         else:
             port = get_esp32_ip()
         
         arduino_upload(UPLOAD_CMD, port)
 
-        if "usb_upload" in sys.argv:
+        if "usb" in sys.argv:
             ip = esp32_serial_com_get_ip()
             log_esp32(ip)
         
