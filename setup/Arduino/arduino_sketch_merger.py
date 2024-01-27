@@ -12,10 +12,10 @@ ESP32_LOG_PATH = "../esp32_setup/esp32_hostname_log/esp32_hostname_log.json"
 COMPILE_CMD = "sudo ./arduino-cli compile --fqbn esp32:esp32:esp32 ./merged_sketch_temp"
 UPLOAD_CMD = "sudo ./arduino-cli upload -p port --fqbn esp32:esp32:esp32 ./merged_sketch_temp"
 
-# TODO: --help flag and --nocompile flag? help text file? README.md?
-# TODO: ip address instead of hostname (seems hostname as ip when uploading is a feature not implemented in arduino-cli)
+# TODO: --help flag? help text file? README.md?
   
 def log_esp32(ip):
+    """ Logs the esp32 ip to the esp32_hostname_log.json file if the hostname is not already logged. """
 
     hostname = get_hostname()
 
@@ -45,6 +45,8 @@ def log_esp32(ip):
 
 
 def get_esp32_ip():
+    """ Gets the esp32 ip from the esp32_hostname_log.json file """
+
     hostname = get_hostname()
 
     with open(ESP32_LOG_PATH, "r") as esp32_hostname_log_file:
@@ -56,6 +58,8 @@ def get_esp32_ip():
 
 
 def get_hostname():
+    """ Gets the hostname from the .ino filepath from command line argument """
+
     # get the hostname from the path from command line argument
     path = sys.argv[1]
     parts = path.split('/')
@@ -63,7 +67,9 @@ def get_hostname():
     hostname = '/'.join(parts[home_index + 1:-1]) + "/esp32_1"
     return hostname
 
+
 def merge_ino_files(filepath_to_merge):
+    """ Merges the OTA setup code into the sketch file to be compiled and uploaded."""
 
     wifi_ssid = os.environ.get("WIFI_SSID")
     wifi_password = os.environ.get("WIFI_PASSWORD")
@@ -123,6 +129,7 @@ def merge_ino_files(filepath_to_merge):
 
 
 def arduino_compile(command):
+    """ Compiles the merged sketch file."""
 
     print("Starting compile")
     process = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -136,6 +143,7 @@ def arduino_compile(command):
 
 
 def arduino_upload(command, port):
+    """ Uploads the sketch to the esp32 board via arduino-cli command. """
 
     command = command.replace("port", port)
 
@@ -166,7 +174,9 @@ def arduino_upload(command, port):
     sys.exit(1)
 
 
+# TODO: cleaner way to get ip? a function call on esp32?
 def esp32_serial_com_get_ip():
+    """ Gets the ip from the esp32 via serial communication. """
 
     time_now = time.time()
 
@@ -187,7 +197,6 @@ def esp32_serial_com_get_ip():
 
 
 def main():
-
     try:
         filepath_to_merge = sys.argv[1]
         # check if file is readable
@@ -208,16 +217,18 @@ def main():
     else:
         print("No compile flag, skipping compile step.")
 
-    if "usb_upload" in sys.argv:
-        print("Uploading to usb")
-        arduino_upload(UPLOAD_CMD, "/dev/ttyUSB0")
-        ip = esp32_serial_com_get_ip()
-        print(f"log ip: {ip}")
-        log_esp32(ip)
-
     if "upload" in sys.argv:
-        ip = get_esp32_ip()
-        arduino_upload(UPLOAD_CMD, ip)
+        if "usb_upload" in sys.argv:
+            port = "/dev/ttyUSB0"
+        else:
+            port = get_esp32_ip()
+        
+        arduino_upload(UPLOAD_CMD, port)
+
+        if "usb_upload" in sys.argv:
+            ip = esp32_serial_com_get_ip()
+            log_esp32(ip)
+        
     else:
         print("No upload flag, skipping upload step.")
 
