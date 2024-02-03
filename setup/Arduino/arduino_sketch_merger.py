@@ -157,6 +157,8 @@ def merge_mqtt_file(filepath_to_merge):
 
     # mqtt crediential swap
     mqtt_setup_blocks[0] = mqtt_setup_blocks[0].replace("mqtt_server_ip", mqtt_server)
+    mqtt_topic = "/".join(filepath_to_merge.split("/")[-4:-2]) 
+    mqtt_setup_blocks[0] = mqtt_setup_blocks[0].replace("temp/temp", mqtt_topic)
 
     with open(UPLOAD_TEMP_PATH, "r") as sketch_file_indexs:
 
