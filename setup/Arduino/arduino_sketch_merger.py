@@ -6,7 +6,8 @@ import time
 import serial
 
 UPLOAD_TEMP_PATH = "merged_sketch_temp/merged_sketch_temp.ino"
-OTA_TEMPLATE_PATH = "../esp32_setup/esp32_first_connect/esp32_ota_template/esp32_ota_template.ino"
+OTA_TEMPLATE_PATH = "../esp32_setup/esp32_templates/esp32_ota_template/esp32_ota_template.ino"
+MQTT_TEMPLATE_PATH = "../esp32_setup/esp32_templates/esp32_mqtt_template/esp32_mqtt_template.ino"
 ESP32_LOG_PATH = "../esp32_setup/esp32_hostname_log/esp32_hostname_log.json"
 
 COMPILE_CMD = "sudo ./arduino-cli compile --fqbn esp32:esp32:esp32 ./merged_sketch_temp"
@@ -68,7 +69,7 @@ def get_hostname():
     return hostname
 
 
-def merge_ino_files(filepath_to_merge):
+def merge_ota_file(filepath_to_merge):
     """ Merges the OTA setup code into the sketch file to be compiled and uploaded."""
 
     wifi_ssid = os.environ.get("WIFI_SSID")
@@ -127,6 +128,58 @@ def merge_ino_files(filepath_to_merge):
         with open(UPLOAD_TEMP_PATH, "w") as merged_file:
             merged_file.writelines(sketch_to_merge)
 
+def merge_mqtt_file(filepath_to_merge):
+
+    mqtt_server = os.environ.get("MQTT_SERVER")
+
+    if mqtt_server is None:
+        print("MQTT server not set in environment variables.")
+        print("forgot command: [source ~/.profile] ?")
+        sys.exit(1)
+    
+    mqtt_setup_blocks = []
+    with open(MQTT_TEMPLATE_PATH, "r") as mqtt_template_file:
+        mqtt_setup_block = ""
+        setup_flag = False
+        for line in mqtt_template_file:
+
+            if "Start of MQTT" in line:
+                setup_flag = True
+
+            if setup_flag:
+                mqtt_setup_block += line   
+
+            if "End of MQTT" in line:
+                setup_flag = False
+                mqtt_setup_block += "\n"
+                mqtt_setup_blocks.append(mqtt_setup_block)
+                mqtt_setup_block = ""
+
+    # mqtt crediential swap
+    mqtt_setup_blocks[0] = mqtt_setup_blocks[0].replace("mqtt_server_ip", mqtt_server)
+
+    with open(UPLOAD_TEMP_PATH, "r") as sketch_file_indexs:
+
+        # Some magic numbers to the indexes to insert the OTA setup code :)
+        # So that the OTA setup code is inserted in the right place
+        for i, line in enumerate(sketch_file_indexs):
+            if "void setup() {" in line:
+                void_setup_index = i + 2
+
+            if "void loop() {" in line:
+                void_loop_index = i + 3
+
+    #Fetch and merge the sketch
+    with open(UPLOAD_TEMP_PATH, "r") as sketch_file:
+        sketch_to_merge = sketch_file.readlines()
+
+        sketch_to_merge.insert(0, mqtt_setup_blocks[0])
+        sketch_to_merge.insert(void_setup_index, mqtt_setup_blocks[1])
+        sketch_to_merge.insert(void_loop_index, mqtt_setup_blocks[2])
+
+        # Written to a temp file to be accessed by the arduino-cli
+        with open(UPLOAD_TEMP_PATH, "w") as merged_file:
+            merged_file.writelines(sketch_to_merge)
 
 def arduino_compile(command):
     """ Compiles the merged sketch file."""
@@ -210,7 +263,14 @@ def main():
         print("No file to upload file path specified.")
         sys.exit(1)
     else:
-        merge_ino_files(filepath_to_merge)
+        print("Merging OTA setup code.")
+        merge_ota_file(filepath_to_merge)
+
+        if "mqtt" in sys.argv:
+            print("Merging mqtt setup code.")
+            merge_mqtt_file(filepath_to_merge)
+        else:
+            print("No mqtt flag, skipping mqtt setup code merge.")
 
     if "compile" in sys.argv:
         arduino_compile(COMPILE_CMD)
