@@ -218,8 +218,10 @@ def arduino_upload(command, port):
             if "A fatal error occurred:" in str(output):
                 break
 
-            if "following info" in str(output):
+            elif "following info" in str(output):
                 print("Press enter")
+            else:
+                print(str(output))
 
         if process.returncode == 0:
             print("Sketch uploaded successfully.")

@@ -1,0 +1,17 @@
+arduino_sketch_merger.py:
+
+    command to lunch merger script: sudo -E python3 arduino_sketch_merger.py {path to starter file} {flags}
+    
+    flags:
+	-upload:
+	    uses the arduino-cli to upload the merged sketch to the board specified in esp32_hostname_log.json
+	    file with the shortened name of {path to starter file}  
+	-compile
+	    uses the arduino-cli to compile the merged sketch
+	-usb
+	    changes the port that the program uploads the sketch, used when first upload is done to the board
+	-mqtt
+	    merges the nessessary setup code for the mqtt PubSubClient, starter file is expected to have callback()
+	    function
+
+arduino_sketch_merger.py:
