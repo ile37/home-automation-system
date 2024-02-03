@@ -1,4 +1,4 @@
-arduino_sketch_merger.py:
+arduino_sketch_merger.py start:
 
     command to lunch merger script: sudo -E python3 arduino_sketch_merger.py {path to starter file} {flags}
     
@@ -14,4 +14,4 @@ arduino_sketch_merger.py:
 	    merges the nessessary setup code for the mqtt PubSubClient, starter file is expected to have callback()
 	    function
 
-arduino_sketch_merger.py:
+arduino_sketch_merger.py end:

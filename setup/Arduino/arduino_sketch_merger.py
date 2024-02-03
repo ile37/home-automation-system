@@ -9,6 +9,7 @@ UPLOAD_TEMP_PATH = "merged_sketch_temp/merged_sketch_temp.ino"
 OTA_TEMPLATE_PATH = "../esp32_setup/esp32_templates/esp32_ota_template/esp32_ota_template.ino"
 MQTT_TEMPLATE_PATH = "../esp32_setup/esp32_templates/esp32_mqtt_template/esp32_mqtt_template.ino"
 ESP32_LOG_PATH = "../esp32_setup/esp32_hostname_log/esp32_hostname_log.json"
+HELP_FILE_PATH = "../help/help.txt"
 
 COMPILE_CMD = "sudo ./arduino-cli compile --fqbn esp32:esp32:esp32 ./merged_sketch_temp"
 UPLOAD_CMD = "sudo ./arduino-cli upload -p port --fqbn esp32:esp32:esp32 ./merged_sketch_temp"
@@ -252,6 +253,19 @@ def esp32_serial_com_get_ip():
             ser.close()
             return None
 
+def help():
+    print_flag = False
+    with open(HELP_FILE_PATH, "r") as help_file:
+        for line in help_file:
+
+            if "arduino_sketch_merger.py end" in line:
+                break
+
+            if print_flag:
+                print(line, end="")
+
+            if "arduino_sketch_merger.py start" in line:
+                print_flag = True
 
 def main():
     try:
@@ -270,19 +284,19 @@ def main():
         print("Merging OTA setup code.")
         merge_ota_file(filepath_to_merge)
 
-        if "mqtt" in sys.argv:
+        if any(arg in ['mqtt', '-mqtt', '--mqtt'] for arg in sys.argv):
             print("Merging mqtt setup code.")
             merge_mqtt_file(filepath_to_merge)
         else:
             print("No mqtt flag, skipping mqtt setup code merge.")
 
-    if "compile" in sys.argv:
+    if any(arg in ['compile', '-compile', '--compile'] for arg in sys.argv):
         arduino_compile(COMPILE_CMD)
     else:
         print("No compile flag, skipping compile step.")
 
-    if "upload" in sys.argv:
-        if "usb" in sys.argv:
+    if any(arg in ['upload', '-upload', '--upload'] for arg in sys.argv):
+        if any(arg in ['usb', '-usb', '--usb'] for arg in sys.argv):
             port = "/dev/ttyUSB0"
         else:
             port = get_esp32_ip()
@@ -295,6 +309,13 @@ def main():
         
     else:
         print("No upload flag, skipping upload step.")
+
+    if any(arg in ['help', '-help', '--help'] for arg in sys.argv):
+        help()
+
+    if len(sys.argv) <= 2:
+        print("No flags specified, skipping all steps.")
+        print("Use --help flag for more information.")
 
 
 if __name__ == "__main__":
