@@ -4,6 +4,7 @@ import subprocess
 import json
 import time
 import serial
+import getpass
 
 UPLOAD_TEMP_PATH = "merged_sketch_temp/merged_sketch_temp.ino"
 OTA_TEMPLATE_PATH = "../esp32_setup/esp32_templates/esp32_ota_template/esp32_ota_template.ino"
@@ -158,8 +159,10 @@ def merge_mqtt_file(filepath_to_merge):
 
     # mqtt crediential swap
     mqtt_setup_blocks[0] = mqtt_setup_blocks[0].replace("mqtt_server_ip", mqtt_server)
-    mqtt_topic = "/".join(filepath_to_merge.split("/")[-4:-2]) 
-    mqtt_setup_blocks[0] = mqtt_setup_blocks[0].replace("temp/temp", mqtt_topic)
+    mqtt_topic_esp_subbed = "/".join(filepath_to_merge.split("/")[-4:-2]) + "/esp_subbed"
+    mqtt_topic_server_subbed = "/".join(filepath_to_merge.split("/")[-4:-2]) + "/server_subbed"
+    mqtt_setup_blocks[0] = mqtt_setup_blocks[0].replace("temp/esp_subbed", mqtt_topic_esp_subbed)
+    mqtt_setup_blocks[0] = mqtt_setup_blocks[0].replace("temp/server_subbed", mqtt_topic_server_subbed)
 
     with open(UPLOAD_TEMP_PATH, "r") as sketch_file_indexs:
 
@@ -220,7 +223,8 @@ def arduino_upload(command, port):
                 break
 
             elif "following info" in str(output):
-                print("Press enter")
+                # only to hide the password in commandline
+                getpass.getpass("Enter password: ")
             else:
                 print(str(output))
 

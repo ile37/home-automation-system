@@ -4,7 +4,8 @@
 
 const char* mqtt_server = "mqtt_server_ip"; // Replace with your MQTT server address
 const int mqtt_port = 1883;
-const char* mqtt_topic = "temp/temp";
+const char* mqtt_topic_esp_subbed = "temp/esp_subbed";
+const char* mqtt_topic_server_subbed = "temp/server_subbed";
 
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -14,7 +15,7 @@ void reconnect() {
     while (!client.connected()) {
         if (client.connect("ESP32Client")) {
             // Once connected, subscribe to the topic
-            client.subscribe(mqtt_topic);
+            client.subscribe(mqtt_topic_esp_subbed);
         } else {
             delay(5000);
         }
