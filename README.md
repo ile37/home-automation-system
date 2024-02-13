@@ -33,6 +33,26 @@ To get started with the home automation system, first, clone the repository to y
 
 2. **Eclipse Mosquitto**: Install Eclipse Mosquitto by following the instructions on the [official Mosquitto website](https://mosquitto.org/download/).
 
+3. **Configuring Environment Variables** You need to set up several environment variables. These variables are crucial for the system to function correctly, as they provide necessary information such as WiFi credentials and the MQTT server address.
+
+Open your terminal and use the following commands to add these variables to your `.profile` file:
+
+```bash
+echo 'export WIFI_SSID="Your_WiFi_SSID"' >> ~/.profile
+echo 'export WIFI_PASSWORD="Your_WiFi_Password"' >> ~/.profile
+echo 'export MQTT_SERVER="Your_MQTT_Server_Address"' >> ~/.profile
+```
+
+Replace `Your_WiFi_SSID`, `Your_WiFi_Password`, and `Your_MQTT_Server_Address` with your actual WiFi SSID, WiFi password, and MQTT server address, respectively.
+
+After adding these lines to your `.profile`, you need to reload the profile or log out and back in for the changes to take effect. To reload your profile, you can use the following command:
+
+```bash
+source ~/.profile
+```
+
+This step ensures that the necessary environment variables are available to the home automation system and any scripts or tools that require them.
+
 ### Esp32 first-time Setup
 
 For the first-time connection of a new esp32 board, use the `-usb` flag to switch to USB port upload. Subsequent uploads can be done normally without the `-usb` flag by leveraging the Arduino OTA library. IP addresses are stored in the `esp32_hostname_log.json` file.
@@ -43,4 +63,32 @@ The system automatically keeps track of connected esp32 boards in the `esp32_hos
 
 ## Usage
 
-After installing and setting up your system, devices can be managed through the filesystem by organizing Arduino sketches in the home directory.
+After installing and setting up your system, managing devices involves organizing Arduino sketches in the home directory and uploading them to your esp32 boards. Here's how to use the system effectively:
+
+### Uploading Sketches
+
+To upload an Arduino sketch to an esp32 board, navigate to the directory containing your sketch and use the following command structure:
+
+```bash
+sudo -E python3 ~/home-automation-system/setup/Arduino/arduino_sketch_merger.py path_to_your_sketch.ino {flags}
+```
+
+- `sudo -E`: Ensures the command runs with the user's environment variables.
+- `python3`: Calls the Python interpreter.
+- `~/setup/Arduino/arduino_sketch.py`: The path to the Python script that handles sketch uploads using the Arduino CLI.
+- `path_to_your_sketch.ino`: Replace this with the actual path to your Arduino sketch file.
+- `{flags}`: Replace this with any additional flags you might need for the upload process.
+
+### Using the -help Flag
+
+For more detailed information on what flags are available and how to use them, you can use the `-help` flag with the `arduino_sketch.py` script. Simply run:
+
+```bash
+python3 ~/home-automation-system/setup/Arduino/arduino_sketch_merger.py -help
+```
+
+This command will display a help message outlining the usage of the script, including a description of all available flags and options. For example, the first time you're connecting a new esp32 board, you might need to use the `-usb` flag to switch to USB port upload. The help message will provide guidance on using this flag among others.
+
+### Tracking and Managing Devices
+
+The system automatically tracks connected esp32 boards in the `esp32_hostname_log.json` file. This file keeps a log of device IP addresses and hostnames, simplifying the process of managing multiple devices within your home automation system.

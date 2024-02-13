@@ -272,6 +272,11 @@ def help():
                 print_flag = True
 
 def main():
+
+    if any(arg in ['help', '-help', '--help'] for arg in sys.argv):
+        help()
+        sys.exit(1)
+
     try:
         filepath_to_merge = sys.argv[1]
         # check if file is readable
@@ -313,9 +318,6 @@ def main():
         
     else:
         print("No upload flag, skipping upload step.")
-
-    if any(arg in ['help', '-help', '--help'] for arg in sys.argv):
-        help()
 
     if len(sys.argv) <= 2:
         print("No flags specified, skipping all steps.")
