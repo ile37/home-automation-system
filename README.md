@@ -27,13 +27,15 @@ Below is a screenshot illustrating the system architecture in a tree format:
 
 To get started with the home automation system, first, clone the repository to your local machine:
 
-#### Setup Environment
+#### Setup third party tools
 
 1. **Arduino CLI**: Download `arduino-cli` from its [official GitHub repository](https://github.com/arduino/arduino-cli) make sure the executable is located in `./setup/Arduino/`.
 
 2. **Eclipse Mosquitto**: Install Eclipse Mosquitto by following the instructions on the [official Mosquitto website](https://mosquitto.org/download/).
 
-3. **Configuring Environment Variables** You need to set up several environment variables. These variables are crucial for the system to function correctly, as they provide necessary information such as WiFi credentials and the MQTT server address.
+#### Configuring Environment Variables 
+
+You need to set up several environment variables. These variables are crucial for the system to function correctly, as they provide necessary information such as WiFi credentials and the MQTT server address.
 
 Open your terminal and use the following commands to add these variables to your `.profile` file:
 
