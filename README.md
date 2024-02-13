@@ -14,9 +14,7 @@ Below is a screenshot illustrating the system architecture in a tree format:
 
 ## Getting Started
 
-### Prerequisites
-
-Before initiating the setup for the home automation system, ensure your environment meets the following requirements:
+### System uses
 
 - **Linux Operating System**: The system is designed to work on a Linux distribution.
 - **Arduino CLI**: Necessary for compiling and uploading sketches to esp32 boards. Place the `arduino-cli` executable in the `./setup/Arduino` folder. Provides a command-line interface for working with Arduino. [Official Arduino CLI documentation](https://arduino.github.io/arduino-cli/latest/).
@@ -37,11 +35,11 @@ To get started with the home automation system, first, clone the repository to y
 
 ### Esp32 first-time Setup
 
-For the first-time connection of a new esp32 board, use the `usb` flag to switch to USB port upload. Subsequent uploads can be done normally without the `usb` flag by leveraging the Arduino OTA library. IP addresses are stored in the `esp32_hostname_log.json` file.
+For the first-time connection of a new esp32 board, use the `-usb` flag to switch to USB port upload. Subsequent uploads can be done normally without the `-usb` flag by leveraging the Arduino OTA library. IP addresses are stored in the `esp32_hostname_log.json` file.
 
 ### Automatic Tracking
 
-The system automatically keeps track of connected esp32 boards in the `esp32_hostname_log.json` file, simplifying device management. If `usb` flag is not found the system automatically searches the `esp32_hostname_log.json` file for the correct port, returns an error if none is found.
+The system automatically keeps track of connected esp32 boards in the `esp32_hostname_log.json` file, simplifying device management. If `-usb` flag is not found the system automatically searches the `esp32_hostname_log.json` file for the correct port, returns an error if none is found.
 
 ## Usage
 
