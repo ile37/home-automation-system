@@ -91,6 +91,28 @@ python3 ~/home-automation-system/setup/Arduino/arduino_sketch_merger.py -help
 
 This command will display a help message outlining the usage of the script, including a description of all available flags and options. For example, the first time you're connecting a new esp32 board, you might need to use the `-usb` flag to switch to USB port upload. The help message will provide guidance on using this flag among others.
 
+### MQTT Network
+
+Before communicating with your ESP32 devices, you need to set up the MQTT network. Follow these steps:
+
+1. Start the MQTT broker by running the following command in your terminal:
+   
+    ```bash
+    sudo systemctl start mosquitto
+    ```
+
+2. ESP32 devices use the following topic format: `file_path/esp_subbed`. ESP32 devices will listen for messages published to this topic.
+
+   Example ESP32 device in `livingroom/curtains` is subscribed to a topic named `"livingroom/curtains/esp_subbed"`.
+
+3. Send messages to ESP32 devices using the `mosquitto_pub` command. Replace `"server_ip"` with the IP address of your MQTT server, `"path/esp_subbed"` with the topic your ESP32 devices are subscribed to, and `"message"` with the content of your message. For example:
+
+    ```bash
+    mosquitto_pub -h "server_ip" -t "path/esp_subbed" -m "message"
+    ```
+
+   You can send messages to ESP32 devices with the command above.
+
 ### Tracking and Managing Devices
 
 The system automatically tracks connected esp32 boards in the `esp32_hostname_log.json` file. This file keeps a log of device IP addresses and hostnames, simplifying the process of managing multiple devices within your home automation system.
